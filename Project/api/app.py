@@ -7,7 +7,6 @@ app = Flask(__name__)
 engine = Engine()
 engine._arena = Arena(engine._data)
 
-# /CHARACTER
 @app.post("/character/join")
 def join_character():
     data = request.json
@@ -17,9 +16,10 @@ def join_character():
     strength = data.get('strength')
     armor = data.get('armor')
     speed = data.get('speed')
-    character = CharacterProxy(cid, teamId, life, strength, armor, speed)
-    if (not check_stats(life, strength, armor, speed)):
-        return "Stats are not correct, you must have 20 points or less in total"
+    try:
+        character = CharacterProxy(cid, teamId, life, strength, armor, speed)
+    except ValueError as e:
+        return str(e)
     engine.addPlayer(character)
     engine._arena.addPlayer(character)
     return character.toDict()

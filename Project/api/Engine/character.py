@@ -5,14 +5,16 @@ class CharacterProxy:
     def __init__(self, cid :str, teamid :str, life :int, strength :int, armor :int, speed :int):
         self._id = cid
         self._teamid = teamid
-        #self._name = name
         self._life = life
         self._strength = strength
         self._armor = armor
         self._speed = speed
+        if self._total_stats() > 20:
+            raise ValueError("Total stats (strength + life + armor + speed) cannot exceed 20.")
+        if self._life < 0 or self._strength < 0 or self._armor < 0 or self._speed < 0:
+            raise ValueError("Stats cannot be negative.")
         self._action = None
         self._target = None
-        #self._id = self._name + str(randint(0, 1000))
         self._dead = False
 
     def isDead(self):
@@ -35,6 +37,9 @@ class CharacterProxy:
 
     def getSpeed(self):
         return self._speed
+
+    def _total_stats(self):
+        return self._life + self._strength + self._armor + self._speed
 
     def getAction(self):
         if self._action == ACTION.HIT or self._action == ACTION.FLY:
