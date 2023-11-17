@@ -3,6 +3,8 @@ from Engine.character import CharacterProxy
 from Engine.engine import Engine
 app = Flask(__name__)
 
+engine = Engine()
+
 # /CHARACTER
 @app.post("/character")
 def create_character():
@@ -14,6 +16,7 @@ def create_character():
     armor = data.get('armor')
     speed = data.get('speed')
     character = CharacterProxy(cid, teamId, life, strength, armor, speed)
+    engine.addPlayer(character)
     return character.toDict()
 
 @app.put("/character")
@@ -25,32 +28,34 @@ def edit_character():
     strength = data.get('strength')
     armor = data.get('armor')
     speed = data.get('speed')
-    print(cid)
-    engine = Engine()
     character_to_edit = engine.getPlayerByName(cid)
     print(character_to_edit)
-    character = CharacterProxy(cid, teamId, life, strength, armor, speed)
-    return character.toDict()
+    return character_to_edit.toDict()
 
 # /ARENA
-@app.get("/arena/<arenaid>/")
+
+@app.post("/arena")
+def create_arena():
+    return "<p>Hello, World!</p>"
+
+@app.get("/arena/<arenaid>")
 def get_arena_characters(arenaid):
     return 'Hello world!' + arenaid
 
 @app.post("/arena/enter")
-def hello_world4():
+def enter_arena():
     return "<p>Hello, World!</p>"
 
 # /ACTION
 @app.post("/action")
-def hello_world5():
+def action():
     return "<p>Hello, World!</p>"
 
 # /RUN
 @app.post("/run")
-def hello_world6():
-    return "<p>Hello, World!</p>"
+def create_engine():
+    return
 
 @app.get("/run")
-def hello_world7():
+def get_engine_status():
     return "<p>Hello, World!</p>"
