@@ -1,6 +1,6 @@
 from flask import Flask
-from character import *
-from engine import *
+from Engine.character import *
+from Engine.engine import *
 import threading
 import time
 

@@ -1,12 +1,10 @@
 from random import randint
-from character import *
-from action import *
-from arena import *
-from data import *
+from Engine.character import *
+from Engine.action import *
+from Engine.arena import *
+from Engine.data import *
 import time
 import json
-
-
 
 class Engine:
     def __init__(self, minPlayersToStart :int = 2, characterTimeout :int = 5):
