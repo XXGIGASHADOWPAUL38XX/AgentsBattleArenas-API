@@ -18,6 +18,8 @@ def join_character():
     armor = data.get('armor')
     speed = data.get('speed')
     character = CharacterProxy(cid, teamId, life, strength, armor, speed)
+    if (not check_stats(life, strength, armor, speed)):
+        return "Stats are not correct, you must have 20 points or less in total"
     engine.addPlayer(character)
     engine._arena.addPlayer(character)
     return character.toDict()
@@ -29,14 +31,18 @@ def set_character_action():
     action = data.get('action')
     target = data.get('target')
     character_to_set_action: CharacterProxy = engine._arena.getPlayerByName(cid)
-    print(character_to_set_action)
+    if (character_to_set_action is None):
+        return "Character not found"
     character_to_set_action.setAction(action)
     character_to_set_action.setTarget(target)
     return character_to_set_action.toDict()
 
 @app.get("/character/<cid>")
 def get_character(cid):
-    return engine._arena.getPlayerByName(cid).toDict()
+    character = engine._arena.getPlayerByName(cid)
+    if (character is None):
+        return "Character not found"
+    return character.toDict()
 
 @app.get("/characters")
 def get_all_characters():
@@ -46,6 +52,11 @@ def get_all_characters():
         characters_dict[character.getId()] = character.toDict()
     return characters_dict
 
-@app.post("/status")
-def action():
-    return "<p>Hello, World!</p>"
+@app.get("/status/<lap>")
+def get_status(lap):
+    return engine.getState()
+
+def check_stats(life: int, strength: int, armor: int, speed: int):
+    if (life + strength + armor + speed) > 20:
+        return False
+    return True
