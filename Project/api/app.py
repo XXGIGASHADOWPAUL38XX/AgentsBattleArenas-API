@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
 from Engine.character import CharacterProxy
 from Engine.engine import Engine
+from Engine.arena import Arena
 app = Flask(__name__)
 
 engine = Engine()
+arenas = []
 
 # /CHARACTER
 @app.post("/character")
@@ -36,15 +38,23 @@ def edit_character():
 
 @app.post("/arena")
 def create_arena():
-    return "<p>Hello, World!</p>"
+    arena = Arena()
+    arenas.append(arena)
+    return arena.toDict()
 
 @app.get("/arena/<arenaid>")
 def get_arena_characters(arenaid):
-    return 'Hello world!' + arenaid
+    return arenas[arenaid].toDict()
 
 @app.post("/arena/enter")
 def enter_arena():
-    return "<p>Hello, World!</p>"
+    data = request.json
+    player_cid = data.get('player_cid')
+    arena_id = data.get('arena_id')
+    arena = arenas[arena_id]
+    character = engine.getPlayerByName(player_cid)
+    arena.addPlayer(character)
+    return arena.toDict()
 
 # /ACTION
 @app.post("/action")
