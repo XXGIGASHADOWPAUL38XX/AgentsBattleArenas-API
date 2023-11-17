@@ -5,11 +5,11 @@ from Engine.arena import Arena
 app = Flask(__name__)
 
 engine = Engine()
-arenas = []
+engine._arena = Arena(engine._data)
 
 # /CHARACTER
-@app.post("/character")
-def create_character():
+@app.post("/character/join")
+def join_character():
     data = request.json
     cid = data.get('cid')
     teamId = data.get('teamId')
@@ -19,53 +19,33 @@ def create_character():
     speed = data.get('speed')
     character = CharacterProxy(cid, teamId, life, strength, armor, speed)
     engine.addPlayer(character)
+    engine._arena.addPlayer(character)
     return character.toDict()
 
-@app.put("/character")
-def edit_character():
+@app.post("/character/action")
+def set_character_action():
     data = request.json
     cid = data.get('cid')
-    teamId = data.get('teamId')
-    life = data.get('life')
-    strength = data.get('strength')
-    armor = data.get('armor')
-    speed = data.get('speed')
-    character_to_edit = engine.getPlayerByName(cid)
-    print(character_to_edit)
-    return character_to_edit.toDict()
+    action = data.get('action')
+    target = data.get('target')
+    character_to_set_action: CharacterProxy = engine._arena.getPlayerByName(cid)
+    print(character_to_set_action)
+    character_to_set_action.setAction(action)
+    character_to_set_action.setTarget(target)
+    return character_to_set_action.toDict()
 
-# /ARENA
+@app.get("/character/<cid>")
+def get_character(cid):
+    return engine._arena.getPlayerByName(cid).toDict()
 
-@app.post("/arena")
-def create_arena():
-    arena = Arena()
-    arenas.append(arena)
-    return arena.toDict()
+@app.get("/characters")
+def get_all_characters():
+    characters = engine._arena._playersList
+    characters_dict = {}
+    for character in characters:
+        characters_dict[character.getId()] = character.toDict()
+    return characters_dict
 
-@app.get("/arena/<arenaid>")
-def get_arena_characters(arenaid):
-    return arenas[arenaid].toDict()
-
-@app.post("/arena/enter")
-def enter_arena():
-    data = request.json
-    player_cid = data.get('player_cid')
-    arena_id = data.get('arena_id')
-    arena = arenas[arena_id]
-    character = engine.getPlayerByName(player_cid)
-    arena.addPlayer(character)
-    return arena.toDict()
-
-# /ACTION
-@app.post("/action")
+@app.post("/status")
 def action():
-    return "<p>Hello, World!</p>"
-
-# /RUN
-@app.post("/run")
-def create_engine():
-    return
-
-@app.get("/run")
-def get_engine_status():
     return "<p>Hello, World!</p>"
